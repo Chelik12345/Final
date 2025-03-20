@@ -1,0 +1,26 @@
+# example values
+
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:h2:file:./searchengine
+    driverClassName: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+indexing-settings:
+  sites:
+    - url: https://www.skillbox.ru
+      name: Skillbox
+    - url: https://www.playback.ru
+      name: PlayBack.Ru

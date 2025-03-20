@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Engine</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Поисковый движок</h1>
+        
+        <div class="row mt-4">
+            <div class="col">
+                <button id="startIndexing" class="btn btn-primary">Начать индексацию</button>
+                <button id="stopIndexing" class="btn btn-danger">Остановить индексацию</button>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col">
+                <h3>Добавить/обновить страницу:</h3>
+                <div class="input-group">
+                    <input type="text" id="pageUrl" class="form-control" placeholder="Введите URL страницы">
+                    <button id="indexPage" class="btn btn-success">Добавить/обновить</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col">
+                <h3>Статистика:</h3>
+                <div id="statistics"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // Обновление статистики
+            function updateStatistics() {
+                $.get('/api/statistics', function(data) {
+                    let html = `
+                        <p>Всего сайтов: ${data.total.sites}</p>
+                        <p>Всего страниц: ${data.total.pages}</p>
+                        <p>Всего лемм: ${data.total.lemmas}</p>
+                        <p>Индексация: ${data.total.isIndexing ? 'В процессе' : 'Остановлена'}</p>
+                    `;
+                    $('#statistics').html(html);
+                });
+            }
+
+            // Начать индексацию
+            $('#startIndexing').click(function() {
+                $.get('/api/startIndexing', function(data) {
+                    if (data.result) {
+                        alert('Индексация запущена');
+                    } else {
+                        alert('Ошибка: ' + data.error);
+                    }
+                    updateStatistics();
+                });
+            });
+
+            // Остановить индексацию
+            $('#stopIndexing').click(function() {
+                $.get('/api/stopIndexing', function(data) {
+                    if (data.result) {
+                        alert('Индексация остановлена');
+                    } else {
+                        alert('Ошибка: ' + data.error);
+                    }
+                    updateStatistics();
+                });
+            });
+
+            // Добавить/обновить страницу
+            $('#indexPage').click(function() {
+                let url = $('#pageUrl').val();
+                $.post('/api/indexPage', { url: url }, function(data) {
+                    if (data.result) {
+                        alert('Страница добавлена/обновлена');
+                    } else {
+                        alert('Ошибка: ' + data.error);
+                    }
+                    updateStatistics();
+                });
+            });
+
+            // Обновляем статистику при загрузке страницы
+            updateStatistics();
+            // Обновляем статистику каждые 5 секунд
+            setInterval(updateStatistics, 5000);
+        });
+    </script>
+</body>
+</html> 
